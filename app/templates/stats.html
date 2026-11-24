@@ -1,0 +1,92 @@
+{% extends "base.html" %}
+
+{% block title %}/{{ link.code }} istatistikleri - LinkKısaltıcı{% endblock %}
+
+{% macro breakdown(title, rows, total) %}
+<div class="col-md-6 col-lg-3">
+    <div class="bg-white border p-3 h-100 stat-card">
+        <h3 class="h6 mb-3">{{ title }}</h3>
+        {% for row in rows %}
+        {% set pct = (row.total * 100 / total) | round | int %}
+        <div class="mb-2">
+            <div class="d-flex justify-content-between small">
+                <span>{{ row.label }}</span><span class="text-muted">{{ row.total }} · %{{ pct }}</span>
+            </div>
+            <div class="bar"><span style="width: {{ pct }}%"></span></div>
+        </div>
+        {% else %}
+        <p class="text-muted small mb-0">Henüz veri yok.</p>
+        {% endfor %}
+    </div>
+</div>
+{% endmacro %}
+
+{% block content %}
+<div class="py-4">
+    <a href="/" class="small text-decoration-none">← Ana sayfa</a>
+    <h1 class="h3 fw-bold mt-2 mb-1">/{{ link.code }}</h1>
+    <div class="d-flex align-items-center gap-2 flex-wrap">
+        <a href="{{ short_url }}" target="_blank">{{ short_url }}</a>
+        <button type="button" class="btn btn-sm btn-outline-secondary" onclick="copyText('{{ short_url }}', this)">Kopyala</button>
+    </div>
+    <p class="text-muted small mt-1 mb-0 text-truncate">→ {{ link.url }}</p>
+</div>
+
+<div class="row g-3 mb-3">
+    <div class="col-6 col-md-3">
+        <div class="bg-white border p-3 stat-card">
+            <div class="text-muted small">Toplam tıklama</div>
+            <div class="fs-2 fw-bold">{{ link.click_count }}</div>
+        </div>
+    </div>
+    <div class="col-6 col-md-3">
+        <div class="bg-white border p-3 stat-card">
+            <div class="text-muted small">Oluşturulma</div>
+            <div class="fs-6 fw-semibold mt-2">{{ link.created_at | tarih }}</div>
+        </div>
+    </div>
+</div>
+
+{% set total = link.click_count or 1 %}
+<div class="row g-3 mb-3">
+    {{ breakdown("📱 Cihaz", stats.by_device, total) }}
+    {{ breakdown("🌐 Tarayıcı", stats.by_browser, total) }}
+    {{ breakdown("💻 İşletim sistemi", stats.by_os, total) }}
+    {{ breakdown("↪️ Geldiği site", stats.by_referrer, total) }}
+</div>
+
+<div class="row g-3">
+    <div class="col-lg-4">
+        <div class="bg-white border p-3 h-100 stat-card">
+            <h3 class="h6 mb-3">📅 Günlük tıklama (son 14 gün)</h3>
+            <table class="table table-sm mb-0">
+                {% for row in stats.by_day %}
+                <tr><td>{{ row.day }}</td><td class="text-end fw-semibold">{{ row.total }}</td></tr>
+                {% else %}
+                <tr><td class="text-muted small">Henüz veri yok.</td></tr>
+                {% endfor %}
+            </table>
+        </div>
+    </div>
+    <div class="col-lg-8">
+        <div class="bg-white border p-3 h-100 stat-card">
+            <h3 class="h6 mb-3">🕒 Son tıklamalar</h3>
+            <div class="table-responsive">
+                <table class="table table-sm mb-0">
+                    <thead><tr><th>Zaman</th><th>Cihaz</th><th>Tarayıcı</th><th>Sistem</th><th>Geldiği site</th></tr></thead>
+                    <tbody>
+                    {% for c in stats.last_clicks %}
+                    <tr>
+                        <td class="small">{{ c.clicked_at | tarih }}</td>
+                        <td>{{ c.device }}</td><td>{{ c.browser }}</td><td>{{ c.os }}</td><td>{{ c.referrer }}</td>
+                    </tr>
+                    {% else %}
+                    <tr><td colspan="5" class="text-muted small">Henüz tıklama yok. Kısa linki paylaş!</td></tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
