@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="tr">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>LinkKısaltıcı</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .hero { padding: 3rem 0 1rem; }
+        .narrow { max-width: 720px; }
+        .result-box { padding: 1rem 1.5rem; border: 1px dashed #0d6efd; border-radius: .75rem; background: #f4f8ff; }
+        .original-url { max-width: 380px; }
+    </style>
+</head>
+<body class="bg-body-tertiary">
+<nav class="navbar bg-white border-bottom">
+    <div class="container"><a class="navbar-brand fw-semibold" href="/">🔗 LinkKısaltıcı</a></div>
+</nav>
+
+<main class="container">
+    <section class="hero text-center">
+        <h1 class="fw-bold">Uzun linkleri saniyeler içinde kısalt</h1>
+        <p class="text-muted">Kısa link oluştur, paylaş, kaç kez tıklandığını takip et.</p>
+
+        <form method="post" class="narrow mx-auto mt-4">
+            <div class="input-group input-group-lg">
+                <input name="url" value="{{ url or '' }}" class="form-control"
+                       placeholder="https://cok-uzun-bir-link.com/..." autocomplete="off" required>
+                <button type="submit" class="btn btn-primary px-4">Kısalt</button>
+            </div>
+            {% if error %}<div class="text-danger mt-2">{{ error }}</div>{% endif %}
+        </form>
+
+        {% if short_url %}
+        <div class="result-box narrow mx-auto mt-4">
+            <span class="text-muted small">Kısa linkin hazır:</span>
+            <div class="d-flex align-items-center justify-content-center gap-2 mt-1">
+                <a id="shortUrl" href="{{ short_url }}" target="_blank" class="fs-5 fw-semibold">{{ short_url }}</a>
+                <button type="button" class="btn btn-sm btn-outline-secondary" onclick="copyShortUrl(this)">Kopyala</button>
+            </div>
+        </div>
+        {% endif %}
+    </section>
+
+    {% if links %}
+    <section class="mt-5 bg-white p-3 rounded border">
+        <h2 class="h5 mb-3">Son linkler</h2>
+        <div class="table-responsive">
+            <table class="table align-middle mb-0">
+                <thead>
+                <tr><th>Kısa link</th><th>Asıl adres</th><th class="text-end">Tıklama</th><th class="text-end">Oluşturulma</th></tr>
+                </thead>
+                <tbody>
+                {% for link in links %}
+                <tr>
+                    <td><a href="/{{ link.code }}" target="_blank">/{{ link.code }}</a></td>
+                    <td class="text-truncate original-url" title="{{ link.url }}">{{ link.url }}</td>
+                    <td class="text-end"><span class="badge text-bg-light">{{ link.click_count }}</span></td>
+                    <td class="text-end text-muted small">{{ link.created_at }}</td>
+                </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </section>
+    {% endif %}
+</main>
+
+<footer class="text-center text-muted small py-4">&copy; 2026 LinkKısaltıcı</footer>
+
+<script>
+    function copyShortUrl(button) {
+        navigator.clipboard.writeText(document.getElementById('shortUrl').href);
+        button.textContent = 'Kopyalandı ✓';
+        setTimeout(() => button.textContent = 'Kopyala', 2000);
+    }
+</script>
+</body>
+</html>
