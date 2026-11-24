@@ -47,8 +47,10 @@ python -m venv .venv
 **3. Uygulamayı başlatın**
 
 ```powershell
-.\.venv\Scripts\python.exe -m uvicorn app.main:app --reload
+.\.venv\Scripts\python.exe run.py
 ```
+
+> VS Code kullanıyorsanız: sağ alttan Python yorumlayıcısı olarak `.venv` ortamını seçin, ardından `run.py` dosyasını açıp ▶ **Run** butonuna basın.
 
 **4. Tarayıcıda açın:** http://localhost:8000
 
@@ -74,6 +76,7 @@ LinkKisaltici-Py/
 │       └── index.html   # Ana sayfa tasarımı
 ├── tests/
 │   └── test_app.py      # Otomatik testler
+├── run.py               # Uygulamayı başlatan dosya
 └── requirements.txt     # Gerekli Python paketleri
 ```
 
